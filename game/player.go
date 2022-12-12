@@ -14,6 +14,7 @@ type Board struct {
 	BoardLayout   [][]int
 	MovesCount    int
 	GameCondition int
+	Size          int
 }
 
 type Actions []Board
@@ -28,6 +29,7 @@ func NewBoard(size int) *Board {
 		}
 	}
 
+	NewBoard.Size = size
 	NewBoard.GameCondition = OnGoing
 	NewBoard.MovesCount = 0
 
@@ -59,7 +61,6 @@ func (b Board) MaxMin(symbol int) Board {
 	board := deepCopy(b)
 
 	if b.GameCondition != OnGoing {
-		// fmt.Println(b)
 		return b
 	}
 
@@ -80,8 +81,6 @@ func (b Board) MaxMin(symbol int) Board {
 		for i, action := range actions {
 			actions[i].GameCondition = action.MaxMin(Cross).GameCondition
 		}
-		// min := deepCopy(actions[0])
-		// min.GameCondition = 99
 		var min Board
 		for i, action := range actions {
 			if i == 0 {
@@ -97,14 +96,12 @@ func (b Board) MaxMin(symbol int) Board {
 		for i, action := range actions {
 			actions[i].GameCondition = action.MaxMin(Circle).GameCondition
 		}
-		// max := deepCopy(actions[0])
-		// max.GameCondition = -99
 		var max Board
 		for i, action := range actions {
 			if i == 0 {
 				max = deepCopy(action)
 			}
-			if action.GameCondition > max.GameCondition && action.GameCondition < 3 {
+			if action.GameCondition > max.GameCondition && action.GameCondition < OnGoing {
 				max = deepCopy(action)
 			}
 		}
@@ -117,17 +114,18 @@ func (b Board) MaxMin(symbol int) Board {
 func (board *Board) CheckVictory() {
 	var symbol int
 
-	for rowIndex := 0; rowIndex < 3; rowIndex++ {
-		for i := 0; i < 3; i++ {
-			if i == 0 {
-				symbol = board.BoardLayout[rowIndex][i]
+	//rows
+	for rowIndex := range board.BoardLayout {
+		for columnIndex := range board.BoardLayout[rowIndex] {
+			if columnIndex == 0 {
+				symbol = board.BoardLayout[rowIndex][columnIndex]
 			}
 
-			if board.BoardLayout[rowIndex][i] != symbol {
+			if board.BoardLayout[rowIndex][columnIndex] != symbol {
 				break
 			}
 
-			if i == 2 {
+			if columnIndex == board.Size-1 {
 				switch symbol {
 				case Circle:
 					board.GameCondition = CircleWin
@@ -142,16 +140,16 @@ func (board *Board) CheckVictory() {
 	}
 
 	//columns
-	for rowIndex := 0; rowIndex < 3; rowIndex++ {
-		for i := 0; i < 3; i++ {
-			if i == 0 {
-				symbol = board.BoardLayout[i][rowIndex]
+	for rowIndex := range board.BoardLayout {
+		for columnIndex := range board.BoardLayout[rowIndex] {
+			if columnIndex == 0 {
+				symbol = board.BoardLayout[columnIndex][rowIndex]
 			}
 
-			if board.BoardLayout[i][rowIndex] != symbol {
+			if board.BoardLayout[columnIndex][rowIndex] != symbol {
 				break
 			}
-			if i == 2 {
+			if columnIndex == board.Size-1 {
 				switch symbol {
 				case Circle:
 					board.GameCondition = CircleWin
@@ -166,14 +164,14 @@ func (board *Board) CheckVictory() {
 	}
 
 	//diagonal
-	for rowIndex := 0; rowIndex < 3; rowIndex++ {
+	for rowIndex := range board.BoardLayout {
 		if rowIndex == 0 {
 			symbol = board.BoardLayout[rowIndex][rowIndex]
 		}
 		if board.BoardLayout[rowIndex][rowIndex] != symbol {
 			break
 		}
-		if rowIndex == 2 {
+		if rowIndex == board.Size-1 {
 			switch symbol {
 			case Circle:
 				board.GameCondition = CircleWin
@@ -185,14 +183,14 @@ func (board *Board) CheckVictory() {
 		}
 	}
 
-	for rowIndex := 0; rowIndex < 3; rowIndex++ {
+	for rowIndex := range board.BoardLayout {
 		if rowIndex == 0 {
-			symbol = board.BoardLayout[rowIndex][2-rowIndex]
+			symbol = board.BoardLayout[rowIndex][(board.Size-1)-rowIndex]
 		}
-		if board.BoardLayout[rowIndex][2-rowIndex] != symbol {
+		if board.BoardLayout[rowIndex][(board.Size-1)-rowIndex] != symbol {
 			break
 		}
-		if rowIndex == 2 {
+		if rowIndex == board.Size-1 {
 			switch symbol {
 			case Circle:
 				board.GameCondition = CircleWin

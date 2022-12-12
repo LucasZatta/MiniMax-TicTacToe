@@ -99,10 +99,7 @@ func (state *GameState) Action() {
 		}
 
 	} else {
-		// newBoard := state.Board.MaxMin(state.CurrentPlayer.Symbol)
-		// fmt.Println(newBoard)
 		state.Board.BoardLayout = state.Board.MaxMin(state.CurrentPlayer.Symbol).BoardLayout
-		// state.Board.GameCondition = newBoard.GameCondition
 	}
 
 	state.CurrentPlayerNum = 1 - state.CurrentPlayerNum
